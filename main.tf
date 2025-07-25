@@ -69,17 +69,17 @@ module "records" {
       records = [
         module.jenkins-agent.private_ip
       ]
-    },
-     {
-      name    = "nexus"
-      type    = "A"
-      ttl     = 1
-      allow_overwrite = true
-      records = [
-        module.nexus.private_ip
-      ]
-      allow_overwrite = true
     }
+    #  {
+    #   name    = "nexus"
+    #   type    = "A"
+    #   ttl     = 1
+    #   allow_overwrite = true
+    #   records = [
+    #     module.nexus.private_ip
+    #   ]
+    #   allow_overwrite = true
+    # }
 
   ]
 }
