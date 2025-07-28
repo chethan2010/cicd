@@ -8,11 +8,11 @@ resource "aws_key_pair" "vpn" {
 
 module "jenkins" {
   source  = "terraform-aws-modules/ec2-instance/aws"
-  key_name = aws_key_pair.vpn.public_key
+   key_name = aws_key_pair.vpn.public_key
   name = "jenkins-tf"
   instance_type          = "t3.micro"
-  vpc_security_group_ids = ["sg-02b46bf3da815a952"]
-  subnet_id = "subnet-04093fa40f500aed6"
+  vpc_security_group_ids = ["sg-0f0a7949588bb50bd"]
+  subnet_id = "subnet-0bd15c4a10cf8e333"
   ami = data.aws_ami.ami_info.id
   user_data = file("jenkins.sh")
   tags = {
@@ -28,8 +28,8 @@ module "jenkins-agent" {
   name = "jenkins-tf"
 
   instance_type          = "t3.micro"
-  vpc_security_group_ids = ["sg-02b46bf3da815a952"]
-  subnet_id = "subnet-04093fa40f500aed6"
+  vpc_security_group_ids = ["sg-0f0a7949588bb50bd"]
+  subnet_id = "subnet-0bd15c4a10cf8e333"
   ami = data.aws_ami.ami_info.id
   user_data = file("jenkins-agent.sh")
   tags = {
