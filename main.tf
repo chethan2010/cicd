@@ -1,62 +1,67 @@
-resource "aws_key_pair" "vpn" {
-  key_name   = "jenkins"
+# resource "aws_key_pair" "jenkins_agent_key" {
+#   key_name   = "jenkins-agent-key"
+#   public_key = file("C:/Users/hp/.ssh/jenkins-agent-key.pub")
+# }
+
+resource "aws_key_pair" "tools" {
+  key_name   = "tools"
   # you can paste the public key directly like this
   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAVOVEfSZEvhDHtqiaeuuKOAb1O3ZfoO2IOp8ux/zCEl hp@DESKTOP-CVSHAG8"
   # public_key = file("~/.ssh/openvpn.pub")
   # ~ means windows home directory
 }
 
-module "jenkins" {
-  source  = "terraform-aws-modules/ec2-instance/aws"
-   key_name = aws_key_pair.vpn.public_key
-  name = "jenkins-tf"
-  instance_type          = "t3.micro"
-  vpc_security_group_ids = ["sg-0f0a7949588bb50bd"]
-  subnet_id = "subnet-0bd15c4a10cf8e333"
-  ami = data.aws_ami.ami_info.id
-  user_data = file("jenkins.sh")
-  tags = {
-    
-        Name = "jenkins-Master"
-}
-}
-
-
-module "jenkins-agent" {
-  source  = "terraform-aws-modules/ec2-instance/aws"
-  key_name = aws_key_pair.vpn.public_key
-  name = "jenkins-tf"
-
-  instance_type          = "t3.micro"
-  vpc_security_group_ids = ["sg-0f0a7949588bb50bd"]
-  subnet_id = "subnet-0bd15c4a10cf8e333"
-  ami = data.aws_ami.ami_info.id
-  user_data = file("jenkins-agent.sh")
-  tags = {
-        Name = "jenkins-agent"
-    }
-}
-
-
-# module "nexus" {
-#      source  = "terraform-aws-modules/ec2-instance/aws"
-#   name = "nexus"
-
-#   instance_type          = "t3.medium"
-#   vpc_security_group_ids = ["sg-08f131185f8967295"]
-#   subnet_id = "subnet-0ca01a6ab094ac6da"
-#   ami = data.aws_ami.nexus_ami_info.id
-#   key_name = aws_key_pair.tools.key_name
-#    root_block_device = [
-#     {
-#       volume_type = "gp3"
-#       volume_size = 30
-#     }
-#   ]
+# module "jenkins" {
+#   source  = "terraform-aws-modules/ec2-instance/aws"
+#   key_name = aws_key_pair.jenkins_agent_key.key_name
+#   name = "jenkins-tf"
+#   instance_type          = "t3.micro"
+#   vpc_security_group_ids = ["sg-0f0a7949588bb50bd"]
+#   subnet_id = "subnet-0bd15c4a10cf8e333"
+#   ami = data.aws_ami.ami_info.id
+#   user_data = file("jenkins.sh")
 #   tags = {
-#     Name = "nexus"
-#   }
+    
+#         Name = "jenkins-Master"
 # }
+# }
+
+
+# module "jenkins-agent" {
+#   source  = "terraform-aws-modules/ec2-instance/aws"
+#   key_name = aws_key_pair.jenkins_agent_key.key_name
+#   name = "jenkins-tf"
+
+#   instance_type          = "t3.micro"
+#   vpc_security_group_ids = ["sg-0f0a7949588bb50bd"]
+#   subnet_id = "subnet-0bd15c4a10cf8e333"
+#   ami = data.aws_ami.ami_info.id
+#   user_data = file("jenkins-agent.sh")
+#   tags = {
+#         Name = "jenkins-agent"
+#     }
+# }
+
+
+module "nexus" {
+     source  = "terraform-aws-modules/ec2-instance/aws"
+  name = "nexus"
+
+  instance_type          = "t3.medium"
+  vpc_security_group_ids = ["sg-0499d70758d96fef2"]
+  subnet_id = "subnet-0f1043db64da18241"
+  ami = data.aws_ami.nexus_ami_info.id
+  key_name = aws_key_pair.tools.key_name
+   root_block_device = [
+    {
+      volume_type = "gp3"
+      volume_size = 30
+    }
+  ]
+  tags = {
+    Name = "nexus"
+  }
+}
 
 module "records" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
@@ -65,32 +70,17 @@ module "records" {
   zone_name =var.zone_name
   
   records = [
-    {
-      name    = "jenkins"
-      type    = "A"
-      ttl = 1
-      records = [
-        module.jenkins.public_ip
-      ]
-    },
-    {
-      name    = "jenkins-agent"
-      type    = "A"
-      ttl = 1
-      records = [
-        module.jenkins-agent.private_ip
-      ]
-    }
-    #  {
-    #   name    = "nexus"
-    #   type    = "A"
-    #   ttl     = 1
-    #   allow_overwrite = true
-    #   records = [
-    #     module.nexus.private_ip
-    #   ]
-    #   allow_overwrite = true
-    # }
+    
+     {
+         name    = "nexus"
+         type    = "A"
+         ttl     = 1
+         allow_overwrite = true
+         records = [
+         module.nexus.private_ip
+         ]
+       allow_overwrite = true
+       }
 
   ]
 }
