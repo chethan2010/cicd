@@ -48,21 +48,20 @@ module "nexus" {
   name = "nexus"
 
   instance_type          = "t3.medium"
-  vpc_security_group_ids = ["sg-0499d70758d96fef2"]
-  subnet_id = "subnet-0f1043db64da18241"
+  vpc_security_group_ids = ["sg-03a2dc81b08aeaa7d"]
+  subnet_id = "subnet-063a992d2b4ceb970"
   ami = data.aws_ami.nexus_ami_info.id
   key_name = aws_key_pair.tools.key_name
-   root_block_device = [
-    {
+   root_block_device = {
+    
       volume_type = "gp3"
       volume_size = 30
-    }
-  ]
-  tags = {
-    Name = "nexus"
-  }
+  
+  # tags = {
+  #   Name = "nexus"
+  # }
 }
-
+}
 module "records" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 2.0"
